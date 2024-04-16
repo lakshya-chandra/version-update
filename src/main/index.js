@@ -2,6 +2,7 @@ import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import { autoUpdater } from "electron-updater";
 
 function createWindow() {
   // Create the browser window.
@@ -33,6 +34,7 @@ function createWindow() {
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
+  autoUpdater.checkForUpdatesAndNotify();
 }
 
 // This method will be called when Electron has finished
@@ -52,6 +54,10 @@ app.whenReady().then(() => {
   // IPC test
   ipcMain.on('ping', () => console.log('pong'))
 
+  ipcMain.handle('auto_updater', () => {
+    autoUpdater.quitAndInstall();
+});
+
   createWindow()
 
   app.on('activate', function () {
@@ -69,6 +75,16 @@ app.on('window-all-closed', () => {
     app.quit()
   }
 })
+
+// Auto Updater Events
+autoUpdater.on("update-available", () => {
+  mainWindow.webContents.send('auto_updater', 'Update Available');
+});
+
+autoUpdater.on("update-downloaded", () => {
+  mainWindow.webContents.send('auto_updater', 'Update Downloaded');
+});
+
 
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.

@@ -1,8 +1,9 @@
 import Versions from './components/Versions'
 import electronLogo from './assets/electron.svg'
+import AutoUpdaterNotification from './components/auto-updater-notif'
 
 function App() {
-  const ipcHandle = () => window.electron.ipcRenderer.send('ping')
+  const ipcHandle = () => window.Electron.ipcRenderer.send('ping')
 
   return (
     <>
@@ -27,6 +28,7 @@ function App() {
         </div>
       </div>
       <Versions></Versions>
+  <AutoUpdaterNotification />
     </>
   )
 }
