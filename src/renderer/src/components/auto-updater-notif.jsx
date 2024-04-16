@@ -8,9 +8,9 @@ const { confirm } = Modal;
 
 export default function AutoUpdaterNotification() {
     const [api, contextHolder] = notification.useNotification();
-
     useEffect(() => {
-        window.ipc?.on('auto_updater', (data) => {
+        window.api?.on('auto_updater', (data) => {
+            console.log("called1 renderer")
             if (data === 'Update Available') {
                 api.info({
                     message: 'Software Update Available',
@@ -21,6 +21,7 @@ export default function AutoUpdaterNotification() {
             }
 
             if (data === 'Update Downloaded') {
+                console.log("called2 downloaded")
                 confirm({
                     title: 'Software Updates Ready',
                     content: <div className="mb-4">Software updates are done</div>,
@@ -29,7 +30,7 @@ export default function AutoUpdaterNotification() {
                     cancelText: 'Install on next aluncg',
                     centered: true,
                     async onOk() {
-                        await window.ipc?.invoke('auto_updater');
+                        await  window.api?.invoke('auto_updater');
                     },
                 });
             }

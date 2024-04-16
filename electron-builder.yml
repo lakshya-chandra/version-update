@@ -38,7 +38,8 @@ appImage:
   artifactName: ${name}-${version}.${ext}
 npmRebuild: false
 publish:
-  provider: generic
-  url: https://github.com/lakshya-chandra/image-filter-app
+  provider: github
+  owner: lakshya-chandra
+  repo: version-update
 electronDownload:
   mirror: https://npmmirror.com/mirrors/electron/

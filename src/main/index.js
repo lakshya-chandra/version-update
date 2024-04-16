@@ -3,6 +3,15 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { autoUpdater } from "electron-updater";
+import { log } from './logger';
+
+
+log.initialize({ preload: true })
+
+
+autoUpdater.logger = log;
+// @ts-ignore
+autoUpdater.logger.transports.file.level = "info";
 
 function createWindow() {
   // Create the browser window.
@@ -30,11 +39,20 @@ function createWindow() {
   // HMR for renderer base on electron-vite cli.
   // Load the remote URL for development or the local html file for production.
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
+    autoUpdater.updateConfigPath = join(__dirname, 'dev-app-update.yml');
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
   autoUpdater.checkForUpdatesAndNotify();
+  // Auto Updater Events
+autoUpdater.on("update-available", () => {
+  mainWindow.webContents.send('auto_updater', 'Update Available');
+});
+
+autoUpdater.on("update-downloaded", () => {
+  mainWindow.webContents.send('auto_updater', 'Update Downloaded');
+});
 }
 
 // This method will be called when Electron has finished
@@ -75,15 +93,6 @@ app.on('window-all-closed', () => {
     app.quit()
   }
 })
-
-// Auto Updater Events
-autoUpdater.on("update-available", () => {
-  mainWindow.webContents.send('auto_updater', 'Update Available');
-});
-
-autoUpdater.on("update-downloaded", () => {
-  mainWindow.webContents.send('auto_updater', 'Update Downloaded');
-});
 
 
 // In this file you can include the rest of your app"s specific main process
